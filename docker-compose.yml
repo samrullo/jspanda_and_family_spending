@@ -1,0 +1,114 @@
+version: '3.4'
+
+services:
+  jspanda:
+    build:
+      context: ./jspanda_business
+      dockerfile: Dockerfile
+    container_name: jspanda
+    volumes:
+      - ./jspanda_business/:/var/www/jspanda_business
+    environment:
+      SECRET_KEY: JSPANDA_SECRET
+      SQLALCHEMY_DATABASE_URI: "postgresql://postgres:postgres@jspanda-postgres:5432/jspanda"
+      CFLAGS: -Qunused-arguments
+      CPPFLAGS: -Qunused-arguments
+      FLASK_ENV: production
+      TOKEN_EXPIRATION: 3600
+    command: ["systemctl","start","jspanda"]
+    networks:
+      - webnet
+    depends_on:
+      jspanda-postgres:
+        condition: service_healthy
+
+  jspanda-postgres:
+    container_name: "jspanda_postgres"
+    build:
+      context: ./jspanda_business  # Adjust if needed
+      dockerfile: postgres.dockerfile
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: jspanda
+    volumes:
+      - ./jspanda_business/postgres_data/db_dumps/:/var/dump
+      - ./jspanda_business/postgres_data/data/:/var/lib/postgresql/data    
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d jspanda"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - webnet
+    # Add other jspanda-specific settings (e.g., ports, environment) as needed
+
+  certbot:
+    image: certbot/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    volumes:
+      - ./jspanda_business/data/certbot/conf:/etc/letsencrypt
+      - ./jspanda_business/data/certbot/www:/var/www/certbot
+
+  family-spending:
+    build:
+      context: ./family-spending-djrest
+      dockerfile: Dockerfile
+    container_name: family_spending
+    volumes:
+      - ./family-spending-djrest/:/var/www/family_spending
+    environment:
+      hostname: "family-spending.local"
+      webappport: "80"
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_HOSTNAME: family-spending-postgres
+      POSTGRES_DB: family_spending
+      POSTGRES_PORT: 5432
+    command: ["systemctl","start","family_spending"]
+    networks:
+      - webnet
+    depends_on:
+      family-spending-postgres:
+        condition: service_healthy
+
+  family-spending-postgres:
+    container_name: "family_spending_postgres"
+    build:
+      context: ./family-spending-djrest  # Adjust if needed
+      dockerfile: postgres.dockerfile
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: family_spending
+    volumes:
+      - ./family-spending-djrest/postgres_data/db_dumps/:/var/dump
+      - ./family-spending-djrest/postgres_data/data/:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d family_spending"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - webnet
+    # Add other family-spending-specific settings (e.g., ports, environment) as needed
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx_proxy    
+    volumes:
+      - ./nginx/etc/nginx/sites-available:/etc/nginx/sites-available
+      - ./nginx/etc/nginx/conf.d:/etc/nginx/conf.d
+      - ./family-spending-djrest/:/var/www/family_spending
+      - ./jspanda_business/:/var/www/jspanda_business
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - webnet
+    depends_on:
+      - jspanda
+      - family-spending
+networks:
+  webnet:
+    driver: bridge
