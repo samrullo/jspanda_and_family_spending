@@ -19,9 +19,8 @@ services:
     networks:
       - webnet
     depends_on:
-      jspanda-postgres:
-        condition: service_healthy
-
+      - jspanda-postgres
+      - certbot          
   jspanda-postgres:
     container_name: "jspanda_postgres"
     build:
@@ -69,9 +68,7 @@ services:
     networks:
       - webnet
     depends_on:
-      family-spending-postgres:
-        condition: service_healthy
-
+      - family-spending-postgres
   family-spending-postgres:
     container_name: "family_spending_postgres"
     build:
