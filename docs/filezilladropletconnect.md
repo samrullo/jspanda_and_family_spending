@@ -4,7 +4,7 @@ Then You create new connection as below as described by ChatGPT.
 
 You don't have to convert to ppk format. FileZilla supports .pem format as well.
 
-```
+
 To connect to a server using SSH keys with FileZilla, you need to follow these steps:
 
 1. **Generate SSH Keys**: If you haven't already, you'll need to generate an SSH key pair. On Unix-like systems, you can do this with the `ssh-keygen` command. On Windows, you can use PuTTYgen or the Git Bash terminal.
