@@ -25,3 +25,8 @@ pip install -r requirements
 systemctl start jspanda
 ```
 
+and 
+
+```bash
+systemctl start family_spending
+```
