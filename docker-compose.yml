@@ -55,7 +55,7 @@ services:
     volumes:
       - ./family-spending-djrest/:/var/www/family_spending
     environment:
-      hostname: "samrullobusiness.shop"
+      hostname: "samrullobusiness.club"
       webappport: "80"
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
