@@ -62,9 +62,7 @@ services:
       POSTGRES_HOSTNAME: family-spending-postgres
       POSTGRES_DB: family_spending
       POSTGRES_PORT: 5432
-      UWSGI_PROCESSES: 4
-      UWSGI_THREADS: 2
-    command: ["uwsgi", "--ini", "/var/www/family_spending/uwsgi.ini"]
+    command: ["systemctl","start","family_spending"]
     networks:
       - webnet
     depends_on:
