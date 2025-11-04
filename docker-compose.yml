@@ -64,14 +64,7 @@ services:
       POSTGRES_PORT: 5432
       UWSGI_PROCESSES: 4
       UWSGI_THREADS: 2
-    command: >
-      sh -c "until pg_isready -h $POSTGRES_HOSTNAME -p $POSTGRES_PORT -U $POSTGRES_USER; do sleep 1; done;
-            uwsgi --ini /var/www/family_spending/uwsgi.ini
-                  --processes ${UWSGI_PROCESSES:-4}
-                  --threads ${UWSGI_THREADS:-2}
-                  --max-requests 2000
-                  --reload-on-rss 512
-                  --die-on-term"
+    command: ["uwsgi", "--ini", "/var/www/family_spending/uwsgi.ini"]
     networks:
       - webnet
     depends_on:
