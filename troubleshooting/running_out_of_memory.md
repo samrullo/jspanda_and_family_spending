@@ -16,7 +16,7 @@ docker-compose up
 Also ```jspanda_bash``` will give you hard time first time installing ```uwsgi```. refer to [uwsgi install solve](uwsgi_install_fails.md)
 
 ```bash
-pip install -r requirements
+pip install -r requirements.txt
 ```
 
 4. Finally start services
