@@ -14,8 +14,7 @@ services:
       CFLAGS: -Qunused-arguments
       CPPFLAGS: -Qunused-arguments
       FLASK_ENV: production
-      TOKEN_EXPIRATION: 3600
-    command: ["uwsgi", "--ini", "/var/www/jspanda_business/uwsgi.ini"]
+      TOKEN_EXPIRATION: 3600    
     networks:
       - webnet
     depends_on:

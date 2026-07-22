@@ -15,6 +15,13 @@ docker-compose up
 
 Also ```jspanda_bash``` will give you hard time first time installing ```uwsgi```. refer to [uwsgi install solve](uwsgi_install_fails.md)
 
+nevertheless in jspanda run below
+```bash
+export CFLAGS=$(echo $CFLAGS | sed 's/-Qunused-arguments//g')
+```
+
+and then install requirements
+
 ```bash
 pip install -r requirements.txt
 ```
